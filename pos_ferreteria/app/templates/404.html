@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 - Página no encontrada</title>
+
+  <!-- Estilos personalizados -->
+  <style>
+    /* Estilo general del body */
+    body {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      background-color: #ef0084;
+      font-family: 'Arial', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* Contenedor del mensaje */
+    .error-container {
+      text-align: center;
+      color: white;
+      max-width: 800px;
+    }
+
+    /* Estilo del código 404 */
+    .error-code {
+      font-size: 10rem;
+      font-weight: bold;
+      margin: 0;
+      color: #ffffff;
+      text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Mensaje de disculpa */
+    .error-message {
+      font-size: 2rem;
+      margin-top: 10px;
+      color: #f5f6fa;
+    }
+
+    /* Enlace al home */
+    .home-link {
+      margin-top: 20px;
+      display: inline-block;
+      text-decoration: none;
+      background-color: #f4521c;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 5px;
+      font-size: 1rem;
+      transition: background-color 0.3s ease;
+    }
+
+    .home-link:hover {
+      background-color: #f4521c;
+    }
+
+    /* Pie de copyright */
+    .copyright {
+      margin-top: 30px;
+      font-size: 0.9rem;
+      color: #95a5a6;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="error-container">
+    <h1 class="error-code">404</h1>
+    <p class="error-message">¡Lo sentimos! La página que buscas no fue encontrada.</p>
+    <a href="{{ url_for('main.home') }}" class="home-link">Volver al inicio</a>
+    <p class="copyright">Copyright &copy; {{ current_year }}. Todos los derechos reservados.</p>
+  </div>
+</body>
+
+</html>

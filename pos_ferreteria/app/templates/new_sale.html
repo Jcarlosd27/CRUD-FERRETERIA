@@ -1,0 +1,398 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Sección para mostrar los mensajes flash -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="alert-container">
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }}" role="alert">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+    <!-- Formulario para la nueva venta -->
+    <form method="POST" action="{{ url_for('main.new_sale') }}" onsubmit="prepareFormSubmission()">
+        {{ form.csrf_token }}
+        <!-- Campo oculto para enviar la lista de productos seleccionados -->
+        <input type="hidden" name="products" id="products-field">
+
+        <!-- Contenedor para la selección de cliente y productos -->
+        <div class="card mb-4">
+            <div class="card-header bg-light text-dark">
+                <strong>Datos de la Venta</strong>
+            </div>
+            <div class="card-body">
+                <!-- Selección de cliente -->
+                <div class="mb-4">
+                    <label for="client-select" class="form-label"><strong>Seleccionar Cliente</strong></label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-user"></i></span>
+                        <select id="client-select" name="client_id" class="form-control" required
+                            onchange="updateCreditInfo()">
+                            <option value="">Seleccione un cliente</option>
+                            {% for client in clients %}
+                            <option value="{{ client.id }}" data-credit-days="{{ client.approved_credit_days }}"
+                                data-credit-amount="{{ client.approved_credit_amount }}">
+                                {{ client.company_name }} - {{ client.rut }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Selección de productos -->
+                <div class="mb-4">
+                    <label for="product-search" class="form-label"><strong>Seleccionar Producto</strong></label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-box"></i></span>
+                        <select id="product-search" class="form-control">
+                            <option value="">Seleccione un producto</option>
+                            {% for product in products %}
+                            <option value="{{ product.id }}" data-name="{{ product.name }}"
+                                data-stock="{{ product.stock }}" data-price="{{ product.sale_price }}">
+                                {{ product.name }} - Stock: {{ product.stock }} - Precio: ${{
+                                "{:,.0f}".format(product.sale_price) }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <button class="btn btn-primary" type="button" style="margin-left: 10px;" onclick="addProduct()">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tabla de productos seleccionados -->
+                <div class="table-responsive mb-4" style="max-height: 300px; overflow-y: auto;">
+                    <table class="table table-bordered table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Producto</th>
+                                <th class="text-center" style="width: 80px;">Stock</th>
+                                <th class="text-center" style="width: 100px;">Cantidad</th>
+                                <th class="text-right" style="width: 120px;">Precio</th>
+                                <th class="text-right" style="width: 120px;">Subtotal</th>
+                                <th class="text-center" style="width: 100px;">Descuento %</th>
+                                <th class="text-right" style="width: 120px;">Valor Descuento</th>
+                                <th class="text-right" style="width: 120px;">Total</th>
+                                <th class="text-center" style="width: 80px;">Eliminar</th>
+                            </tr>
+                        </thead>
+                        <tbody id="product-list">
+                            <!-- Los productos seleccionados se agregarán aquí con JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contenedor para los detalles finales y el crédito -->
+        <div class="d-flex justify-content-between align-items-center mb-4" style="min-height: 300px;">
+            <!-- Contenedor para el crédito y tipo de pago (Izquierda) -->
+            <div class="card" style="width: 450px;">
+                <div class="card-body">
+                    <!-- Crédito asociado al cliente -->
+                    <div class="mb-3">
+                        <label for="credit-days" class="form-label"><strong>Días de Crédito</strong></label>
+                        <input type="text" id="credit-days" class="form-control" readonly>
+                    </div>
+
+                    <!-- Campo para mostrar el monto de crédito aprobado -->
+                    <div class="mb-3">
+                        <label for="credit-amount" class="form-label"><strong>Monto de Crédito Aprobado</strong></label>
+                        <input type="text" id="credit-amount" class="form-control" readonly>
+                    </div>
+                    <!-- Tipo de Pago -->
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <label for="payment-type" class="form-label"><strong>Tipo de Pago</strong></label>
+                        <select id="credit_days" name="credit_days" class="form-control">
+                            <option value="" disabled selected>Seleccione los días de crédito</option>
+                            {% for value, label in credit_days %}
+                            <option value="{{ value }}">{{ label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botones de acción centrados verticalmente -->
+            <div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 300px;">
+                <!-- Emitir Orden -->
+                <button type="submit" class="btn btn-primary mb-2">
+                    <i class="fas fa-dollar-sign"></i> Emitir Orden
+                </button>
+
+                <!-- Crear Proforma -->
+                <button type="button" class="btn btn-warning mb-2" onclick="createProforma()">
+                    <i class="fas fa-file-alt"></i> Crear Proforma
+                </button>
+
+                <!-- Cancelar -->
+                <button type="button" class="btn btn-danger mb-2" onclick="clearForm()">
+                    <i class="fas fa-times"></i> Cancelar
+                </button>
+            </div>
+
+            <!-- Contenedor para el resumen de la venta (Derecha) -->
+            <div class="card" style="width: 450px;">
+                <div class="card-body">
+                    <!-- Subtotal -->
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <label class="form-label mb-0"><strong>Subtotal</strong></label>
+                        <div class="input-group" style="width: 250px;">
+                            <span class="input-group-text"><i class="fas fa-dollar-sign"></i></span>
+                            <input type="text" id="subtotal" class="form-control text-right" readonly>
+                        </div>
+                    </div>
+                    <!-- Descuento -->
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <label class="form-label mb-0"><strong>Valor Descuento</strong></label>
+                        <div class="input-group" style="width: 250px;">
+                            <span class="input-group-text"><i class="fas fa-dollar-sign"></i></span>
+                            <input type="text" id="discount-value" class="form-control text-right" readonly>
+                        </div>
+                    </div>
+                    <!-- IVA -->
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <label class="form-label mb-0"><strong>IVA (19%)</strong></label>
+                        <div class="input-group" style="width: 250px;">
+                            <span class="input-group-text"><i class="fas fa-dollar-sign"></i></span>
+                            <input type="text" id="iva-value" class="form-control text-right" readonly>
+                        </div>
+                    </div>
+                    <!-- Total a Pagar -->
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <label class="form-label mb-0"><strong>Total a Pagar</strong></label>
+                        <div class="input-group" style="width: 250px;">
+                            <span class="input-group-text"><i class="fas fa-dollar-sign"></i></span>
+                            <input type="text" id="total" class="form-control text-right" readonly>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- JavaScript para manejar la selección de múltiples productos y cálculos -->
+<script>
+    let productList = [];
+
+    // Función para agregar un producto seleccionado
+    function addProduct() {
+        let clientSelect = document.getElementById('client-select');
+        let clientId = clientSelect.value;
+
+        if (!clientId) {
+            alert('Por favor, seleccione un cliente antes de añadir productos.');
+            return;
+        }
+
+        let select = document.getElementById('product-search');
+        let selectedOption = select.options[select.selectedIndex];
+
+        let productId = selectedOption.value;
+        let productName = selectedOption.getAttribute('data-name');
+        let productPrice = parseFloat(selectedOption.getAttribute('data-price'));
+        let productStock = parseInt(selectedOption.getAttribute('data-stock'));
+        let quantity = 1;
+        let discount = 0;
+
+        if (!productId) {
+            alert('Seleccione un producto válido.');
+            return;
+        }
+
+        let existingProduct = productList.find(product => product.id === productId);
+        if (existingProduct) {
+            alert('El producto ya ha sido agregado. Modifique la cantidad en la tabla.');
+            return;
+        }
+
+        let product = {
+            id: productId,
+            name: productName,
+            price: productPrice,
+            stock: productStock,
+            quantity: quantity,
+            discount: discount,
+        };
+
+        productList.push(product);
+        renderProductList();
+        calculateTotals();
+    }
+
+    // Renderizar la lista de productos en la tabla
+    function renderProductList() {
+        let tbody = document.getElementById('product-list');
+        tbody.innerHTML = '';
+
+        productList.forEach((product, index) => {
+            let subtotal = Math.round(product.price * product.quantity);
+            let discountValue = Math.round(subtotal * (product.discount / 100));
+            let total = subtotal - discountValue;
+
+            let row = `<tr>
+                <td>${product.name}</td>
+                <td class="text-center">${product.stock}</td>
+                <td><input type="number" class="form-control" min="1" max="${product.stock}" value="${product.quantity}" onchange="updateQuantity(${index}, this.value)" style="width: 100px; margin: 0 auto;"></td>
+                <td class="text-right">${product.price.toLocaleString('es-CL')}</td>
+                <td class="text-right">${subtotal.toLocaleString('es-CL')}</td>
+                <td><input type="number" class="form-control" min="0" max="100" value="${product.discount}" onchange="updateDiscount(${index}, this.value)" style="width: 100px; margin: 0 auto;"></td>
+                <td class="text-right">${discountValue.toLocaleString('es-CL')}</td>
+                <td class="text-right">${total.toLocaleString('es-CL')}</td>
+                <td class="text-center"><button class="btn btn-danger btn-sm" onclick="removeProduct(${index})"><i class="fas fa-trash-alt"></i></button></td>
+            </tr>`;
+            tbody.innerHTML += row;
+        });
+    }
+
+    // Función para eliminar un producto de la lista
+    function removeProduct(index) {
+        productList.splice(index, 1);
+        renderProductList();
+        calculateTotals();
+    }
+
+    // Función para actualizar la cantidad de un producto
+    function updateQuantity(index, value) {
+        let quantity = parseInt(value);
+        if (isNaN(quantity) || quantity <= 0) {
+            alert('Ingrese una cantidad válida mayor a cero.');
+            return;
+        }
+        productList[index].quantity = quantity;
+        renderProductList();
+        calculateTotals();
+    }
+
+    // Función para actualizar el descuento de un producto
+    function updateDiscount(index, value) {
+        let discount = parseFloat(value);
+        if (isNaN(discount) || discount < 0 || discount > 100) {
+            alert('Ingrese un descuento válido (0-100).');
+            return;
+        }
+        productList[index].discount = discount;
+        renderProductList();
+        calculateTotals();
+    }
+
+    // Calcular totales
+    function calculateTotals() {
+        let subtotal = Math.round(productList.reduce((acc, product) => acc + (product.price * product.quantity), 0));
+        let discountValue = Math.round(productList.reduce((acc, product) => acc + ((product.price * product.quantity) * (product.discount / 100)), 0));
+        let ivaValue = Math.round((subtotal - discountValue) * 0.19);
+        let total = Math.round((subtotal - discountValue) + ivaValue);
+
+        // Actualizar los campos con formato de miles
+        document.getElementById('subtotal').value = '$' + subtotal.toLocaleString('es-CL');
+        document.getElementById('discount-value').value = '$' + discountValue.toLocaleString('es-CL');
+        document.getElementById('iva-value').value = '$' + ivaValue.toLocaleString('es-CL');
+        document.getElementById('total').value = '$' + total.toLocaleString('es-CL');
+    }
+
+    function updateCreditInfo() {
+        let clientSelect = document.getElementById('client-select');
+        let selectedOption = clientSelect.options[clientSelect.selectedIndex];
+
+        let creditDays = selectedOption.getAttribute('data-credit-days');
+        let creditAmount = selectedOption.getAttribute('data-credit-amount');
+
+        document.getElementById('credit-days').value = creditDays;
+        document.getElementById('credit-amount').value = creditAmount ? '$' + parseFloat(creditAmount).toLocaleString('es-CL') : '';
+    }
+
+    function clearForm() {
+        document.getElementById('client-select').value = "";
+        document.getElementById('product-search').value = "";
+        document.getElementById('credit-days').value = "";
+        document.getElementById('credit-amount').value = "";
+        document.getElementById('payment-type').value = "";
+        document.getElementById('subtotal').value = "";
+        document.getElementById('discount-value').value = "";
+        document.getElementById('iva-value').value = "";
+        document.getElementById('total').value = "";
+
+        productList = [];
+        renderProductList();
+    }
+
+    function cleanNumber(value) {
+        return value.replace(/[^\d.-]/g, '');  // Elimina todo lo que no sea número, punto o signo menos
+    }
+
+    function createProforma() {
+        let clientName = document.getElementById('client-select').options[document.getElementById('client-select').selectedIndex].text;
+        let productDetails = productList.map(product => ({
+            codigo: product.id,
+            detalle: product.name,
+            cantidad: product.quantity,
+            unidad: "UN", // Aquí puedes agregar la unidad si es siempre la misma o dinámica
+            precio_unitario: product.price,
+            descuento: product.discount,
+            total: (product.price * product.quantity) - ((product.price * product.quantity) * (product.discount / 100))
+        }));
+
+        fetch("/create_proforma", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': "{{ csrf_token() }}"
+            },
+            body: JSON.stringify({
+                client_name: clientName,
+                client_rut: '13.541.351-5', // Aquí pones el RUT del cliente seleccionado
+                product_details: productDetails,
+                subtotal: cleanNumber(document.getElementById('subtotal').value),
+                descuento: cleanNumber(document.getElementById('discount-value').value),
+                iva: cleanNumber(document.getElementById('iva-value').value),
+                total: cleanNumber(document.getElementById('total').value)
+            })
+        })
+            .then(response => response.blob())
+            .then(blob => {
+                const url = window.URL.createObjectURL(new Blob([blob]));
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = "orden_de_compra.pdf";  // Cambia el nombre del archivo aquí
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+            })
+            .catch(error => {
+                console.error('Error al crear la orden de compra:', error);
+            });
+    }
+
+
+
+    function prepareFormSubmission() {
+        // Obtén el campo oculto donde se almacenarán los productos
+        const productsField = document.getElementById('products-field');
+
+        // Convierte la lista de productos seleccionados a formato JSON
+        productsField.value = JSON.stringify(productList);
+
+        // Agrega un console.log para verificar que los productos se están enviando correctamente
+        console.log("Lista de productos enviada:", productsField.value);
+    }
+
+    // Desvanecer mensajes flash
+    const alerts = document.querySelectorAll('.alert');
+    alerts.forEach(alert => {
+        setTimeout(() => {
+            alert.style.transition = 'opacity 0.5s ease';
+            alert.style.opacity = '0';
+            setTimeout(() => {
+                alert.remove();
+            }, 500);
+        }, 3000);
+    });
+</script>
+
+{% endblock %}

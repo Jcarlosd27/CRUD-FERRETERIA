@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="page-header mb-4">
+        <h3 class="page-title"><i class="typcn typcn-user-add"></i> Registrar Nuevo Usuario</h3>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('main.home') }}">Inicio</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Registrar Usuario</li>
+            </ol>
+        </nav>
+    </div>
+
+    <form method="POST" enctype="multipart/form-data" class="card shadow-sm p-4"> <!-- Añadir enctype -->
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            {{ form.username.label(class="form-label") }}
+            {{ form.username(class="form-control", placeholder="Nombre de Usuario") }}
+        </div>
+        <div class="form-group">
+            {{ form.email.label(class="form-label") }}
+            {{ form.email(class="form-control", placeholder="Correo Electrónico") }}
+        </div>
+        <div class="form-group">
+            {{ form.password.label(class="form-label") }}
+            {{ form.password(class="form-control", placeholder="Contraseña") }}
+        </div>
+        <div class="form-group">
+            {{ form.role_id.label(class="form-label") }}
+            {{ form.role_id(class="form-control") }}
+        </div>
+        <div class="form-group">
+            <label for="photo" class="form-label">Foto de Usuario</label>
+            <input type="file" name="photo" id="photo" class="form-control" accept="image/*">
+            <!-- Campo para la foto -->
+        </div>
+        <button type="submit" class="btn btn-primary btn-lg">Registrar Usuario</button>
+    </form>
+</div>
+
+<style>
+    /* Estilo para el encabezado */
+    .page-header {
+        border-bottom: 1px solid #e0e0e0;
+        padding-bottom: 20px;
+    }
+
+    /* Mejora del estilo de los formularios */
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .btn-lg {
+        font-size: 1.25rem;
+        /* Aumenta el tamaño de la fuente */
+    }
+</style>
+
+<script>
+    // Desvanecer automáticamente los mensajes de alerta
+    const alerts = document.querySelectorAll('.alert');
+    alerts.forEach(alert => {
+        setTimeout(() => {
+            alert.style.transition = 'opacity 0.5s ease';
+            alert.style.opacity = '0';
+            setTimeout(() => {
+                alert.remove();
+            }, 500); // Remover el elemento después de la transición
+        }, 3000); // Desaparece después de 3 segundos
+    });
+</script>
+
+{% endblock %}

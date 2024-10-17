@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - POS Ferretería</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='template/vendors/typicons.font/font/typicons.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='template/vendors/css/vendor.bundle.base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='template/css/vertical-layout-light/style.css') }}">
+    <style>
+        body {
+            background-color: #f4f5f7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .login-container {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .login-container img {
+            width: 220px;
+            margin-bottom: 1rem;
+        }
+
+        .login-container h3 {
+            font-size: 22px;
+            margin-bottom: 1.5rem;
+            color: #444;
+        }
+
+        .input-group-text {
+            background-color: #fff;
+            border-right: none;
+        }
+
+        .form-control {
+            border-left: none;
+            font-size: 16px;
+            padding: 10px;
+        }
+
+        .btn-orange {
+            background-color: #FF6600;
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+
+        .btn-orange:hover {
+            background-color: #e65c00;
+        }
+
+        footer {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        footer a {
+            color: #FF6600;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-container">
+        <!-- Ruta al logo -->
+        <img src="{{ url_for('static', filename='template/images/LOGO-WULKAN-ORIGINAL.png') }}" alt="Logo Wulkan">
+        <h3>Iniciar Sesión</h3>
+        <form method="POST" action="{{ url_for('main.login') }}">
+            {{ form.hidden_tag() }}
+            <div class="input-group mb-3">
+                <span class="input-group-text">
+                    <i class="typcn typcn-mail"></i>
+                </span>
+                {{ form.email(class="form-control", placeholder="Correo Electrónico") }}
+            </div>
+            <div class="input-group mb-3">
+                <span class="input-group-text">
+                    <i class="typcn typcn-lock-closed-outline"></i>
+                </span>
+                {{ form.password(class="form-control", placeholder="Contraseña") }}
+            </div>
+            {{ form.submit(class="btn btn-orange") }}
+        </form>
+
+        <!-- Pie de página -->
+        <footer>
+            <p>&copy; 2024 <a href="#">WULKAN</a>. Todos los derechos reservados.</p>
+        </footer>
+    </div>
+
+    <!-- JS de la plantilla -->
+    <script src="{{ url_for('static', filename='template/vendors/js/vendor.bundle.base.js') }}"></script>
+    <script src="{{ url_for('static', filename='template/js/off-canvas.js') }}"></script>
+    <script src="{{ url_for('static', filename='template/js/hoverable-collapse.js') }}"></script>
+    <script src="{{ url_for('static', filename='template/js/template.js') }}"></script>
+    <script src="{{ url_for('static', filename='template/js/settings.js') }}"></script>
+    <script src="{{ url_for('static', filename='template/js/todolist.js') }}"></script>
+</body>
+
+</html>

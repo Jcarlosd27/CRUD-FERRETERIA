@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Orden de Compra</title>
+    <style>
+        /* Estilos generales para el cuerpo de la página */
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+            font-size: 12px;
+            /* Ajusta el tamaño general de la fuente */
+        }
+
+        /* Estilos para el contenedor principal que agrupa todo el contenido */
+        .container {
+            width: 100%;
+            max-width: 850px;
+            /* Ajuste para que el contenido se mantenga en el espacio adecuado */
+            margin: 0 auto;
+            padding: 30px;
+            /* Aumenta el padding para asegurar espacio alrededor del contenido */
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Estilos para la cabecera que contiene la información de la empresa y el logo */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            /* Alinea los elementos (logo y datos) a los extremos */
+            align-items: flex-start;
+            /* Alinea los elementos al tope superior */
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        /* Estilos para la sección izquierda que contiene los datos de la empresa */
+        .left-section {
+            text-align: left;
+            flex: 1;
+            /* Toma el mayor espacio disponible */
+            margin-top: 0;
+        }
+
+        /* Estilos para el título de la empresa */
+        .left-section h2 {
+            font-size: 1.5em;
+            margin: 0;
+        }
+
+        /* Estilos para los párrafos que contienen información de contacto */
+        .left-section p {
+            margin: 5px 0;
+            font-size: 0.9em;
+        }
+
+        /* Estilos para la sección derecha que contiene el logo */
+        .right-section {
+            text-align: right;
+            flex: 1;
+            /* No ocupa espacio extra */
+            margin-top: 0;
+        }
+
+        /* Estilos para la imagen del logo */
+        .right-section img {
+            width: 150px;
+            /* Tamaño ajustado del logo */
+            margin-top: 0;
+            /* Alinea el logo en la parte superior */
+        }
+
+        /* Estilos para la información de la orden de compra */
+        .order-info {
+            text-align: right;
+            /* Alinea el texto a la derecha */
+            margin-top: 10px;
+            /* Espaciado ajustado */
+        }
+
+        /* Estilos para el título de la orden de compra */
+        .order-info h2 {
+            margin: 5px 0;
+            /* Espacio entre el título y los otros elementos */
+            font-size: 1.3em;
+        }
+
+        /* Estilos para la sección de detalles del cliente */
+        .details h2 {
+            text-align: left;
+            font-size: 1.2em;
+            border-bottom: 1px solid #333;
+            padding-bottom: 5px;
+        }
+
+        /* Estilos para los detalles del cliente (nombre, RUT, etc.) */
+        .details p {
+            margin: 5px 0;
+            font-size: 0.9em;
+        }
+
+        /* Estilos para la tabla de productos */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            /* Quita los espacios entre celdas */
+            margin: 20px 0;
+            font-size: 0.9em;
+        }
+
+        /* Aplica un borde a la tabla y a cada celda */
+        table,
+        th,
+        td {
+            border: 1px solid #333;
+        }
+
+        /* Estilos para las celdas de la tabla (celdas y encabezados) */
+        th,
+        td {
+            padding: 10px;
+            text-align: left;
+        }
+
+        /* Estilos para los encabezados de la tabla */
+        th {
+            background-color: #f4f4f4;
+            /* Color de fondo para los encabezados */
+        }
+
+        /* Anchos de columnas */
+        table th:nth-child(1),
+        table td:nth-child(1) {
+            width: 10%;
+            /* Código */
+        }
+
+        table th:nth-child(2),
+        table td:nth-child(2) {
+            width: 40%;
+            /* Detalle */
+        }
+
+        table th:nth-child(3),
+        table td:nth-child(3),
+        table th:nth-child(4),
+        table td:nth-child(4),
+        table th:nth-child(5),
+        table td:nth-child(5),
+        table th:nth-child(6),
+        table td:nth-child(6) {
+            width: 10%;
+            /* Cantidad, Unidad, Precio Unitario, Descuento */
+        }
+
+        table th:nth-child(7),
+        table td:nth-child(7) {
+            width: 15%;
+            /* Total */
+        }
+
+        /* Clase que centra el texto */
+        .text-center {
+            text-align: center;
+        }
+
+        /* Estilos para la sección de totales */
+        .total-section {
+            text-align: right;
+            font-weight: bold;
+            /* Negrita para los totales */
+            margin-top: 20px;
+        }
+
+        /* Estilos para los párrafos de la sección de totales */
+        .total-section p {
+            margin: 5px 0;
+        }
+
+        /* Estilos para el pie de página donde se muestra el QR */
+        .footer {
+            text-align: right;
+            margin-top: 30px;
+        }
+
+        /* Estilos para la imagen del código QR */
+        .footer img {
+            width: 100px;
+            /* Tamaño ajustado del código QR */
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Cabecera con el logo y la información de la empresa -->
+        <div class="header">
+            <div class="left-section">
+                <!-- Información de la empresa -->
+                <h2>AVALON GROUP SPA</h2>
+                <p>RUT: 76.803.645-4</p>
+                <p>Dirección: San Nicolás 902, San Miguel</p>
+                <p>Teléfono: +56 229935673</p>
+                <p>Email: contacto@avalongroup.cl</p>
+            </div>
+        </div>
+
+        <!-- Información de la Orden de Compra -->
+        <div class="order-info">
+            <h2>Orden de Compra</h2>
+            <p>Fecha: {{ fecha }}</p> <!-- Muestra la fecha de la orden -->
+            <p>Número de Orden: {{ numero_orden }}</p> <!-- Muestra el número de la orden -->
+        </div>
+
+        <!-- Detalles del cliente -->
+        <div class="details">
+            <h2>Cliente</h2>
+            <p>Nombre: {{ cliente_nombre }}</p> <!-- Muestra el nombre del cliente -->
+            <p>RUT: {{ cliente_rut }}</p> <!-- Muestra el RUT del cliente -->
+        </div>
+
+        <!-- Tabla de productos -->
+        <table>
+            <thead>
+                <tr>
+                    <th class="text-center">Código</th> <!-- Código del producto -->
+                    <th>Detalle</th> <!-- Detalle o descripción del producto -->
+                    <th class="text-center">Cantidad</th> <!-- Cantidad comprada -->
+                    <th class="text-center">Unidad</th> <!-- Unidad de medida (ej: UN) -->
+                    <th class="text-center">Precio Unitario</th> <!-- Precio unitario del producto -->
+                    <th class="text-center">Descuento</th> <!-- Porcentaje de descuento -->
+                    <th class="text-right">Total</th> <!-- Total del producto (cantidad * precio menos descuento) -->
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Recorre la lista de productos y muestra cada uno -->
+                {% for producto in productos %}
+                <tr>
+                    <td class="text-center">{{ producto.codigo }}</td> <!-- Código del producto -->
+                    <td>{{ producto.detalle }}</td> <!-- Detalle del producto -->
+                    <td class="text-center">{{ producto.cantidad }}</td> <!-- Cantidad del producto -->
+                    <td class="text-center">{{ producto.unidad }}</td> <!-- Unidad del producto -->
+                    <td class="text-center">{{ producto.precio_unitario | int | format_thousands }}</td>
+                    <!-- Precio unitario -->
+                    <td class="text-center">{{ producto.descuento }}%</td> <!-- Descuento aplicado -->
+                    <td class="text-right">{{ producto.total | int | format_thousands }}</td>
+                    <!-- Total por producto -->
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Sección de totales -->
+        <div class="total-section">
+            <p>Subtotal: {{ subtotal | int | format_thousands }}</p> <!-- Subtotal de la compra -->
+            <p>Descuento: {{ descuento_total | int | format_thousands }}</p> <!-- Total de descuentos -->
+            <p>IVA (19%): {{ iva | int | format_thousands }}</p> <!-- IVA aplicado -->
+            <p>Total a pagar: {{ total | int | format_thousands }}</p> <!-- Total final a pagar -->
+        </div>
+
+        <!-- Pie de página con el código QR -->
+        <div class="footer">
+            <!-- Mostrar el código QR en base64 -->
+            <img src="data:image/png;base64,{{ qr_code_base64 }}" alt="Código QR">
+            <p>¡Gracias por su compra!</p> <!-- Mensaje de agradecimiento -->
+        </div>
+    </div>
+</body>
+
+</html>

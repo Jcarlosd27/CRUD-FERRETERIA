@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-header">
+    <h3 class="page-title"><i class="typcn typcn-plus"></i> Añadir Nuevo Trabajador </h3>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('main.home') }}">Inicio</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('main.workers') }}">Trabajadores</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Añadir Trabajador</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">Nuevo Trabajador</h4>
+                <p class="card-description">Complete el formulario para añadir un nuevo trabajador.</p>
+                <form method="POST" action="{{ url_for('main.new_worker') }}" enctype="multipart/form-data">
+                    {{ form.hidden_tag() }}
+
+                    <div class="form-group">
+                        <label for="name">Nombre del Trabajador</label>
+                        {{ form.name(class="form-control", placeholder="Ingrese el nombre del trabajador") }}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="position">Cargo</label>
+                        {{ form.position(class="form-control", placeholder="Ingrese el cargo del trabajador") }}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">Teléfono</label>
+                        {{ form.phone(class="form-control", placeholder="Ingrese el teléfono del trabajador") }}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Correo Electrónico</label>
+                        {{ form.email(class="form-control", placeholder="Ingrese el correo electrónico") }}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="photo">Foto del Trabajador (opcional)</label>
+                        <small class="text-muted">Formatos permitidos: jpg, jpeg, png</small>
+                        {{ form.photo(class="form-control-file") }}
+                    </div>
+
+                    <button type="submit" class="btn btn-primary"><i class="typcn typcn-plus"></i> Añadir
+                        Trabajador</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    // Desvanecer mensajes flash
+    const alerts = document.querySelectorAll('.alert');
+    alerts.forEach(alert => {
+        setTimeout(() => {
+            alert.style.transition = 'opacity 0.5s ease';
+            alert.style.opacity = '0';
+            setTimeout(() => {
+                alert.remove();
+            }, 500);
+        }, 3000);
+    });
+</script>
+{% endblock %}

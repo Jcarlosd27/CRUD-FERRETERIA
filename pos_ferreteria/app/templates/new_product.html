@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-header">
+    <h3 class="page-title"><i class="typcn typcn-plus"></i> Añadir Nuevo Producto </h3>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('main.home') }}">Inicio</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('main.products') }}">Productos</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Añadir Producto</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Mostrar mensajes flash -->
+{% with messages = get_flashed_messages(with_categories=True) %}
+{% if messages %}
+<div class="alert-container">
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }}">
+        {{ message }}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endwith %}
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">Nuevo Producto</h4>
+                <p class="card-description">Complete el formulario para añadir un nuevo producto.</p>
+                <form method="POST" action="{{ url_for('main.new_product') }}" enctype="multipart/form-data">
+                    {{ form.hidden_tag() }}
+
+                    <div class="form-group">
+                        <label for="name">Nombre del Producto</label>
+                        {{ form.name(class="form-control", placeholder="Ingrese el nombre del producto") }}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sku">SKU</label>
+                        {{ form.sku(class="form-control", placeholder="Ingrese el SKU del producto") }}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="image">Imagen del Producto</label>
+                        <small class="text-muted">Formatos permitidos: jpg, jpeg, png</small>
+                        {{ form.image(class="form-control-file") }}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="min_stock">Stock Mínimo</label>
+                        {{ form.min_stock(class="form-control", placeholder="Ingrese el stock mínimo") }}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="stock">Stock Actual</label>
+                        {{ form.stock(class="form-control", placeholder="Ingrese el stock actual") }}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sale_price">Precio de Venta</label>
+                        {{ form.sale_price(class="form-control", placeholder="Ingrese el precio de venta") }}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="bulk_price">Precio por Mayor</label>
+                        {{ form.bulk_price(class="form-control", placeholder="Ingrese el precio por mayor") }}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="bulk_quantity">Cantidad Mínima para Precio por Mayor</label>
+                        <small class="text-muted">Ingrese la cantidad mínima de productos para activar el precio por mayor.</small>
+                        {{ form.bulk_quantity(class="form-control", placeholder="Ejemplo: 10") }}
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="pdf">Archivo PDF (opcional)</label>
+                        <small class="text-muted">Formato permitido: PDF</small>
+                        {{ form.pdf(class="form-control-file") }}
+                    </div>
+
+                    <button type="submit" class="btn btn-primary"><i class="typcn typcn-plus"></i> Añadir
+                        Producto</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

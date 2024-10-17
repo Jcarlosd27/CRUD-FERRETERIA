@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="page-header mb-4">
+        <h3 class="page-title"><i class="typcn typcn-user-add"></i> Gestión de Usuarios</h3>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('main.home') }}">Inicio</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Usuarios</li>
+            </ol>
+        </nav>
+    </div>
+
+    <div class="mb-3">
+        <a href="{{ url_for('main.new_user') }}" class="btn btn-success btn-lg">
+            <i class="typcn typcn-plus"></i> Añadir Nuevo Usuario
+        </a>
+    </div>
+
+    <p class="card-description">Administra los usuarios desde aquí.</p>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered table-hover">
+            <thead class="thead-dark">
+                <tr>
+                    <th class="text-center">Nombre de Usuario</th>
+                    <th>Correo Electrónico</th>
+                    <th>Rol</th>
+                    <th class="text-center">Foto</th>
+                    <th class="text-center">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.role.name }}</td>
+                    <td class="text-center">
+                        {% if user.photo %} <!-- Mostrar foto si existe -->
+                        <img src="{{ url_for('static', filename='uploads/' + user.photo) }}"
+                            alt="Foto de {{ user.username }}" style="width: 50px; height: 80px; border-radius: 50%;">
+                        {% else %}
+                        <img src="{{ url_for('static', filename='template/images/avatar.png') }}"
+                            alt="Avatar por defecto" style="width: 50px; height: 50px; border-radius: 50%;">
+                        {% endif %}
+                    </td>
+                    <td class="text-center">
+                        <a href="{{ url_for('main.edit_user', user_id=user.id) }}" class="btn btn-warning btn-sm"
+                            title="Editar">
+                            <i class="typcn typcn-edit"></i>
+                        </a>
+                        <form action="{{ url_for('main.delete_user', user_id=user.id) }}" method="POST"
+                            style="display:inline;"
+                            onsubmit="return confirm('¿Estás seguro de que deseas eliminar este usuario?');">
+                            {{ form.csrf_token }} <!-- Incluir el token CSRF aquí -->
+                            <button type="submit" class="btn btn-danger btn-sm" title="Eliminar">
+                                <i class="typcn typcn-trash"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+    /* Mejora del estilo del encabezado */
+    .page-header {
+        border-bottom: 1px solid #e0e0e0;
+        padding-bottom: 20px;
+    }
+
+    /* Mejora del estilo de la tabla */
+    .table th {
+        background-color: #343a40;
+        color: white;
+    }
+
+    .table td {
+        vertical-align: middle;
+        /* Alinear verticalmente el contenido de las celdas */
+    }
+
+    /* Estilo del botón de añadir usuario */
+    .btn-lg {
+        font-size: 1.25rem;
+        /* Aumenta el tamaño de la fuente */
+    }
+</style>
+
+<script>
+    // Desvanecer automáticamente los mensajes de alerta
+    const alerts = document.querySelectorAll('.alert');
+    alerts.forEach(alert => {
+        setTimeout(() => {
+            alert.style.transition = 'opacity 0.5s ease';
+            alert.style.opacity = '0';
+            setTimeout(() => {
+                alert.remove();
+            }, 500); // Remover el elemento después de la transición
+        }, 3000); // Desaparece después de 3 segundos
+    });
+</script>
+
+{% endblock %}

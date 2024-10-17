@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POS Ferretería</title>
+    <link rel="icon" href="{{ url_for('static', filename='template/images/favicon.png') }}">
+
+    <!-- CSS de la plantilla -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='template/vendors/typicons.font/font/typicons.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='template/vendors/css/vendor.bundle.base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='template/css/vertical-layout-light/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+    ...
+</head>
+
+<!-- Estilos personalizados -->
+<style>
+    /* Botón naranja personalizado */
+    .btn-orange {
+        background-color: #FF6600;
+        /* Color naranja */
+        color: white;
+        border: none;
+    }
+
+    .btn-orange:hover {
+        background-color: #e65c00;
+        /* Color más oscuro para el hover */
+    }
+
+    .user-info {
+        display: flex;
+        flex-direction: column;
+        /* Cambiar a columna para alinear verticalmente */
+        align-items: center;
+        /* Centrar el contenido horizontalmente */
+        padding: 10px;
+    }
+
+    .user-info .avatar {
+        width: 100px;
+        /* Tamaño ajustado de la imagen */
+        height: 125px;
+        /* Tamaño ajustado de la imagen */
+        border-radius: 90%;
+        /* Hacer que sea circular */
+        margin-bottom: 8px;
+        /* Espacio entre la imagen y el nombre */
+        border: 2px solid #07c958;
+        /* Borde verde */
+        box-shadow: 0 0 10px rgba(1, 78, 243, 0.397);
+        /* Sombra */
+    }
+
+    .user-info .username {
+        font-size: 1rem;
+        /* Tamaño del texto del nombre */
+        font-weight: arial;
+        /* Hacer que el nombre sea más destacado */
+        color: #ffffff;
+        /* Color del texto */
+        text-align: center;
+        /* Centrar texto */
+    }
+
+    .welcome-message {
+        font-size: 0.9rem;
+        /* Tamaño del texto del mensaje */
+        color: #cecece;
+        /* Color del texto */
+        margin-bottom: 5px;
+        /* Espacio entre el mensaje y el nombre */
+        font-weight: normal;
+        /* Peso del texto */
+    }
+
+    .btn-icon .typcn {
+        color: white;
+        /* Color blanco para el icono */
+    }
+
+    /* Barra lateral off-canvas */
+    .sidebar-offcanvas {
+        position: fixed;
+        left: 0;
+        /* Mantener siempre a la izquierda */
+        width: 250px;
+        height: 100%;
+        /* Asegura que la barra lateral ocupe toda la altura */
+        transition: transform 0.3s ease;
+        /* Animación suave */
+        background-color: #1b1b29;
+        /* Color de fondo de la barra lateral */
+        z-index: 1000;
+        /* Asegura que la barra lateral esté por encima del contenido */
+    }
+
+    /* Contenedor principal ajustado cuando la barra lateral está visible */
+    .main-panel {
+        margin-left: 250px;
+        /* Deja espacio para la barra lateral */
+        transition: margin-left 0.3s ease;
+    }
+
+    /* Estado activo para pantallas grandes: despliega la barra lateral */
+    .sidebar-offcanvas.active {
+        transform: translateX(0);
+        /* Despliega la barra lateral */
+    }
+
+    /* Estilo para pantallas pequeñas */
+    @media (max-width: 768px) {
+        .sidebar-offcanvas {
+            transform: translateX(-250px);
+            /* Oculta la barra lateral hacia la izquierda */
+        }
+
+        .sidebar-offcanvas.active {
+            transform: translateX(0);
+            /* Despliega la barra lateral */
+        }
+
+        /* Ajuste del contenedor principal en pantallas pequeñas */
+        .main-panel {
+            margin-left: 0;
+            /* No deja espacio para la barra lateral en pantallas pequeñas */
+        }
+    }
+
+    .menu-icon-white {
+        color: #ffffff;
+    }
+</style>
+
+<body>
+    <div class="container-scroller">
+        <!-- Barra superior -->
+        <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
+            <div class="navbar-brand-wrapper d-flex align-items-center justify-content-center">
+                <a class="navbar-brand brand-logo" href="#">POS Ferretería</a>
+                <button class="navbar-toggler navbar-toggler align-self-center d-lg-none" type="button"
+                    data-toggle="offcanvas">
+                    <span class="typcn typcn-th-menu"></span>
+                </button>
+            </div>
+            <div class="navbar-menu-wrapper d-flex align-items-center justify-content-end">
+                <ul class="navbar-nav">
+                    {% if current_user.is_authenticated %}
+                    <li class="nav-item nav-logout">
+                        <a class="nav-link" href="{{ url_for('main.logout') }}">
+                            <button type="button" class="btn btn-orange btn-rounded btn-icon">
+                                <i class="typcn typcn-power text-white"></i>
+                            </button>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.login') }}">Iniciar Sesión</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.register') }}">Registrarse</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </nav>
+
+        <div class="container-fluid page-body-wrapper">
+            <!-- Barra lateral -->
+            <nav class="sidebar sidebar-offcanvas" id="sidebar">
+                <ul class="nav">
+                    {% if current_user.is_authenticated %}
+                    <li class="nav-item user-info">
+                        <a class="nav-link" href="{{ url_for('main.profile') }}">
+                            <div style="text-align: center;"> <!-- Agregando un contenedor centrado -->
+                                {% if current_user.photo %}
+                                <img src="{{ url_for('static', filename='uploads/' + current_user.photo) }}"
+                                    alt="Avatar" class="avatar"> <!-- Mostrar foto si existe -->
+                                {% else %}
+                                <img src="{{ url_for('static', filename='template/images/avatar.png') }}" alt="Avatar"
+                                    class="avatar"> <!-- Imagen por defecto -->
+                                {% endif %}
+                                <div class="welcome-message">Bienvenid@</div> <!-- Mensaje de bienvenida -->
+                                <div class="username">{{ current_user.username }}</div>
+                                <!-- Nombre debajo de la imagen -->
+                            </div>
+                        </a>
+                    </li>
+                    {% endif %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('main.home') }}">
+                            <i class="bi bi-house-door menu-icon"></i>
+                            <span class="menu-title">Home</span>
+                        </a>
+                    </li>
+
+                    <!--------------------------------------------- SECCION DE TRABAJADORES ------------------------------------------------>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="collapse" href="#worker-menu" aria-expanded="false"
+                            aria-controls="worker-menu">
+                            <i class="bi bi-person-circle menu-icon"></i> <!-- Icono diferente para Personal -->
+                            <span class="menu-title">Personal</span>
+                            <i class="menu-arrow"></i>
+                        </a>
+                        <div class="collapse" id="worker-menu">
+                            <ul class="nav flex-column sub-menu">
+                                <li class="nav-item"><a class="nav-link" href="{{ url_for('main.workers') }}">Ver
+                                        personal</a></li>
+                            </ul>
+                        </div>
+                    </li>
+
+                    <!--------------------------------------------- SECCION DE PRODUCTOS ------------------------------------------------>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="collapse" href="#product-menu" aria-expanded="false"
+                            aria-controls="product-menu">
+                            <i class="bi bi-box menu-icon"></i> <!-- Icono para Productos -->
+                            <span class="menu-title">Inventario</span>
+                            <i class="menu-arrow"></i>
+                        </a>
+                        <div class="collapse" id="product-menu">
+                            <ul class="nav flex-column sub-menu">
+                                <li class="nav-item"><a class="nav-link" href="{{ url_for('main.products') }}">Ver
+                                        Productos</a></li>
+                            </ul>
+                        </div>
+                    </li>
+                    <!---------------------------------------------- SECCION DE CLIENTES ------------------------------------------------>
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="collapse" href="#client-menu" aria-expanded="false"
+                            aria-controls="client-menu">
+                            <i class="bi bi-person-fill menu-icon"></i>
+                            <span class="menu-title">Clientes</span>
+                            <i class="menu-arrow"></i>
+                        </a>
+                        <div class="collapse" id="client-menu">
+                            <ul class="nav flex-column sub-menu">
+                                <li class="nav-item"><a class="nav-link" href="{{ url_for('main.clients') }}">Ver
+                                        Clientes</a></li>
+                            </ul>
+                        </div>
+                    </li>
+                    <!---------------------------------------------- SECCION DE VENTAS -------------------------------------------------->
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="collapse" href="#sales-menu" aria-expanded="false"
+                            aria-controls="sales-menu">
+                            <i class="bi bi-cart menu-icon"></i>
+                            <span class="menu-title">Ventas</span>
+                            <i class="menu-arrow"></i>
+                        </a>
+                        <div class="collapse" id="sales-menu">
+                            <ul class="nav flex-column sub-menu">
+                                <li class="nav-item"><a class="nav-link" href="{{ url_for('main.new_sale') }}">Generar
+                                        compra</a></li>
+                                <li class="nav-item"><a class="nav-link" href="{{ url_for('main.sales') }}">Historico
+                                        compras</a></li>
+                            </ul>
+                        </div>
+                    </li>
+
+                    <!-- Texto intermedio -->
+                    <div class="text-center my-3">
+                        <p class="text-white">Gestiona las configuraciones y roles después de administrar las ventas.
+                        </p>
+                    </div>
+
+                    <!----------------------------------------------- CONFIGURACIÓN ----------------------------------------------------->
+                    <li class="nav-item">
+                        <a class="nav-link" data-toggle="collapse" href="#settings-menu" aria-expanded="false"
+                            aria-controls="settings-menu">
+                            <i class="bi bi-gear menu-icon"></i>
+                            <span class="menu-title">Configuración</span>
+                            <i class="menu-arrow"></i>
+                        </a>
+                        <div class="collapse" id="settings-menu">
+                            <ul class="nav flex-column sub-menu">
+                                <li class="nav-item"><a class="nav-link" href="{{ url_for('main.list_roles') }}">Rol</a>
+                                </li>
+                                <li class="nav-item"><a class="nav-link"
+                                        href="{{ url_for('main.list_users') }}">Usuarios</a></li>
+                            </ul>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+
+            <!-- Contenedor principal de contenido -->
+            <div class="main-panel">
+                <div class="content-wrapper">
+                    <div class="container mt-4">
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                        {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                        {% endfor %}
+                        {% endif %}
+                        {% endwith %}
+                        {% block content %}{% endblock %}
+                    </div>
+                </div>
+
+                <!-- Pie de página -->
+                <footer class="footer" style="background-color: #2c3e50; padding: 20px 0; color: #fff;">
+                    <div class="container">
+                        <div class="d-sm-flex justify-content-center justify-content-sm-between">
+                            <span class="text-muted text-center" style="margin-bottom: 10px;">
+                                Copyright © 2024 Created by Jose Carlos Sigueñas G. - Developer
+                            </span>
+                            <div>
+                                <a href="#" class="text-muted" style="margin-right: 15px;" data-toggle="modal"
+                                    data-target="#privacyPolicyModal">Política de Privacidad</a>
+                                <a href="#" class="text-muted" data-toggle="modal"
+                                    data-target="#termsOfServiceModal">Términos de Uso</a>
+                            </div>
+                        </div>
+                    </div>
+                </footer>
+
+                <!-- Modal para Política de Privacidad -->
+                <div class="modal fade" id="privacyPolicyModal" tabindex="-1" role="dialog"
+                    aria-labelledby="privacyPolicyLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="privacyPolicyLabel">Política de Privacidad</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body" style="max-height: 400px; overflow-y: auto;">
+
+                                <p><strong>Última actualización: [14-10-2024]</strong></p>
+                                <p>En <strong>POS Ferretería</strong>, valoramos tu privacidad y nos comprometemos a
+                                    proteger tus datos personales. Esta política de privacidad describe cómo
+                                    recopilamos, utilizamos y compartimos tu información cuando usas nuestra aplicación,
+                                    cumpliendo con la legislación chilena vigente.</p>
+
+                                <h3>1. Información que recopilamos</h3>
+                                <p>Recopilamos diferentes tipos de información para proporcionar y mejorar nuestro
+                                    servicio:</p>
+                                <ul>
+                                    <li><strong>Datos personales:</strong> Al registrarte, recopilamos datos como tu
+                                        nombre, correo electrónico, contraseña y foto de perfil.</li>
+                                    <li><strong>Datos de uso:</strong> Recopilamos información sobre cómo interactúas
+                                        con nuestra aplicación.</li>
+                                    <li><strong>Cookies:</strong> Utilizamos cookies y tecnologías similares para
+                                        rastrear la actividad en nuestra aplicación.</li>
+                                </ul>
+
+                                <h3>2. Uso de la información</h3>
+                                <p>Utilizamos la información que recopilamos para:</p>
+                                <ul>
+                                    <li>Brindar y mantener nuestro servicio.</li>
+                                    <li>Notificarte sobre cambios en nuestra aplicación.</li>
+                                    <li>Permitir la participación en funciones interactivas.</li>
+                                    <li>Brindar atención al cliente y soporte.</li>
+                                    <li>Recopilar análisis o información valiosa para mejorar nuestra aplicación.</li>
+                                    <li>Monitorear el uso de nuestra aplicación.</li>
+                                    <li>Detectar y prevenir fraudes.</li>
+                                </ul>
+
+                                <h3>3. Compartir tu información</h3>
+                                <p>No compartimos tu información personal con terceros sin tu consentimiento, excepto en
+                                    las siguientes circunstancias:</p>
+                                <ul>
+                                    <li>Para cumplir con una obligación legal, como lo establece la Ley N° 19.628 sobre
+                                        Protección de la Vida Privada.</li>
+                                    <li>Para proteger y defender los derechos o propiedad de POS Ferretería.</li>
+                                    <li>Para prevenir o investigar posibles irregularidades.</li>
+                                </ul>
+
+                                <h3>4. Seguridad de la información</h3>
+                                <p>Implementamos medidas de seguridad razonables para proteger tu información personal.
+                                    Sin embargo, ningún método de transmisión a través de Internet o almacenamiento
+                                    electrónico es 100% seguro.</p>
+
+                                <h3>5. Cambios a esta política de privacidad</h3>
+                                <p>Podemos actualizar nuestra política de privacidad de vez en cuando. Te notificaremos
+                                    sobre cualquier cambio publicando la nueva política en esta página.</p>
+
+                                <h3>6. Contacto</h3>
+                                <p>Si tienes alguna pregunta sobre esta política de privacidad, no dudes en
+                                    contactarnos:</p>
+                                <p><strong>Email:</strong> contacto@posferreteria.com</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Modal para Términos de Uso -->
+                <div class="modal fade" id="termsOfServiceModal" tabindex="-1" role="dialog"
+                    aria-labelledby="termsOfServiceLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="termsOfServiceLabel">Términos de Uso</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body" style="max-height: 400px; overflow-y: auto;">
+                                <p><strong>Última actualización: [14-10-2024]</strong></p>
+                                <p>Al utilizar la aplicación <strong>POS Ferretería</strong>, aceptas cumplir y estar
+                                    sujeto a los siguientes términos y condiciones. Si no estás de acuerdo con alguno de
+                                    estos términos, no debes utilizar nuestra aplicación.</p>
+
+                                <h3>1. Aceptación de los Términos</h3>
+                                <p>Al acceder o utilizar nuestra aplicación, aceptas que has leído, entendido y aceptas
+                                    estar obligado por estos términos de uso y nuestras políticas de privacidad.</p>
+
+                                <h3>2. Uso de la aplicación</h3>
+                                <ul>
+                                    <li><strong>Licencia:</strong> Te otorgamos una licencia limitada para acceder y
+                                        utilizar la aplicación para tus fines personales y comerciales.</li>
+                                    <li><strong>Prohibiciones:</strong> No puedes usar la aplicación para ningún
+                                        propósito ilegal o no autorizado.</li>
+                                </ul>
+
+                                <h3>3. Propiedad intelectual</h3>
+                                <p>Todos los derechos de propiedad intelectual relacionados con la aplicación son
+                                    propiedad de <strong>POS Ferretería</strong> o sus licenciantes. La aplicación está
+                                    protegida por derechos de autor y otras leyes de propiedad intelectual.</p>
+
+                                <h3>4. Limitación de responsabilidad</h3>
+                                <p>En la máxima medida permitida por la ley, <strong>POS Ferretería</strong> no será
+                                    responsable de ningún daño indirecto, incidental o consecuente que surja del uso o
+                                    incapacidad de uso de la aplicación.</p>
+
+                                <h3>5. Modificaciones a los Términos</h3>
+                                <p>Nos reservamos el derecho de modificar estos términos en cualquier momento. Cualquier
+                                    cambio entrará en vigencia cuando se publique en esta página.</p>
+
+                                <h3>6. Legislación aplicable</h3>
+                                <p>Estos términos se regirán e interpretarán de acuerdo con las leyes de la República de
+                                    Chile.</p>
+
+                                <h3>7. Contacto</h3>
+                                <p>Si tienes alguna pregunta sobre estos Términos de Uso, por favor contáctanos:</p>
+                                <p><strong>Email:</strong> contacto@posferreteria.com</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JS de la plantilla -->
+    <script src="{{ url_for('static', filename='template/vendors/js/vendor.bundle.base.js') }}"></script>
+    <script src="{{ url_for('static', filename='template/js/off-canvas.js') }}"></script>
+    <script src="{{ url_for('static', filename='template/js/hoverable-collapse.js') }}"></script>
+    <script src="{{ url_for('static', filename='template/js/template.js') }}"></script>
+    <script src="{{ url_for('static', filename='template/js/settings.js') }}"></script>
+    <script src="{{ url_for('static', filename='template/js/todolist.js') }}"></script>
+</body>
+
+</html>

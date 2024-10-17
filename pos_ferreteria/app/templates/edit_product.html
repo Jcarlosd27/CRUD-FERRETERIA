@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-header">
+    <h3 class="page-title"><i class="typcn typcn-edit"></i> Editar Producto </h3>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('main.home') }}">Inicio</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('main.products') }}">Productos</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Editar Producto</li>
+        </ol>
+    </nav>
+</div>
+
+<!-- Mostrar mensajes flash -->
+{% with messages = get_flashed_messages(with_categories=True) %}
+{% if messages %}
+<div class="alert-container">
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }}">
+        {{ message }}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endwith %}
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">Editar Producto</h4>
+                <p class="card-description">Complete el formulario para actualizar el producto.</p>
+                <form method="POST" action="" enctype="multipart/form-data">
+                    {{ form.hidden_tag() }}
+
+                    <div class="form-group">
+                        <label for="name">{{ form.name.label }}</label>
+                        {{ form.name(class="form-control", placeholder="Ingrese el nombre del producto") }}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sku">{{ form.sku.label }}</label>
+                        {{ form.sku(class="form-control", placeholder="Ingrese el SKU del producto") }}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="min_stock">{{ form.min_stock.label }}</label>
+                        {{ form.min_stock(class="form-control", placeholder="Ingrese el stock mínimo") }}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="stock">{{ form.stock.label }}</label>
+                        {{ form.stock(class="form-control", placeholder="Ingrese la cantidad en stock") }}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="sale_price">{{ form.sale_price.label }}</label>
+                        {{ form.sale_price(class="form-control", placeholder="Ingrese el precio de venta") }}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="bulk_price">{{ form.bulk_price.label }}</label>
+                        {{ form.bulk_price(class="form-control", placeholder="Ingrese el precio por mayor") }}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="bulk_quantity">{{ form.bulk_quantity.label }}</label>
+                        <small class="text-muted">Ingrese la cantidad mínima para aplicar el precio por mayor.</small>
+                        {{ form.bulk_quantity(class="form-control", placeholder="Ejemplo: 10") }}
+                    </div>                    
+
+                    <div class="form-group">
+                        <label for="image">{{ form.image.label }}</label><br>
+                        {% if product.image %}
+                        <img src="{{ url_for('static', filename='uploads/' + product.image) }}"
+                            alt="Imagen actual del producto" width="100"><br><br>
+                        {% endif %}
+                        {{ form.image(class="form-control-file") }}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="pdf">{{ form.pdf.label }}</label><br>
+                        {% if product.pdf %}
+                        <a href="{{ url_for('main.download_pdf', product_id=product.id) }}">Descargar PDF
+                            Actual</a><br><br>
+                        {% endif %}
+                        <small class="text-muted">Formato permitido: PDF</small>
+                        {{ form.pdf(class="form-control-file") }}
+                    </div>
+
+                    <button type="submit" class="btn btn-primary"><i class="typcn typcn-tick"></i> Guardar
+                        Cambios</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

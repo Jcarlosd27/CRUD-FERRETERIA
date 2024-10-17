@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-header mb-4">
+    <h3 class="page-title"><i class="typcn typcn-home-outline"></i> Bienvenido al POS de la Ferretería</h3>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('main.home') }}">Inicio</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Home</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <!-- Sección de Gestión General -->
+    <div class="col-md-6 grid-margin stretch-card">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h4 class="card-title"><i class="typcn typcn-th-large-outline"></i> Gestión General</h4>
+                <p class="card-description">Gestione sus productos, pedidos y más desde este panel de administración.</p>
+                <div class="d-flex justify-content-between">
+                    <a href="{{ url_for('main.products') }}" class="btn btn-primary mt-3 btn-lg hover-effect">
+                        <i class="typcn typcn-shopping-cart"></i> Ir a Productos
+                    </a>
+                    <a href="{{ url_for('main.sales') }}" class="btn btn-success mt-3 btn-lg hover-effect">
+                        <i class="typcn typcn-clipboard"></i> Ver Ventas
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sección de Línea de Crédito -->
+    <div class="col-md-6 grid-margin stretch-card">
+        <div class="credit-widget card shadow-sm">
+            <div class="card-body">
+                <h4 class="card-title"><i class="typcn typcn-credit-card"></i> Línea de Crédito</h4>
+                <div class="credit-status">
+                    <div class="credit-bar">
+                        <div id="credit-bar-fill" style="width: 0%;"></div>
+                    </div>
+                    <div class="credit-info">
+                        <span>Crédito disponible: <strong id="credit-amount">$0</strong></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Incluir el script de Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Obtener los datos de ventas y crédito pasados desde la vista
+    const salesData = JSON.parse('{{ sales_data | tojson | safe }}');
+    const creditData = JSON.parse('{{ credit_data | tojson | safe }}');
+
+    // Preparar los datos para el gráfico de ventas
+    const labels = Object.keys(salesData);
+    const data = Object.values(salesData);
+
+    // Crear el gráfico de ventas
+    const ctxSales = document.getElementById('salesChart').getContext('2d');
+    const salesChart = new Chart(ctxSales, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Ventas Totales ($)',
+                data: data,
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 2,
+                fill: false
+            }]
+        },
+        options: {
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Fecha'
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Ventas ($)'
+                    }
+                }
+            }
+        }
+    });
+
+    // Calcular la línea de crédito
+    const totalCredit = creditData.total_credit;
+    const usedCredit = creditData.used_credit;
+    const availableCredit = totalCredit - usedCredit;
+
+    // Actualizar el monto en el widget
+    document.getElementById('credit-amount').innerText = `$${availableCredit}`;
+
+    // Calcular el porcentaje de la línea de crédito
+    const creditPercentage = (availableCredit / totalCredit) * 100;
+
+    // Actualizar la barra de crédito
+    document.getElementById('credit-bar-fill').style.width = `${creditPercentage}%`;
+
+    // Filtrar productos por búsqueda
+    document.getElementById('searchInput').addEventListener('keyup', function () {
+            let searchValue = this.value.toLowerCase();
+            let rows = document.querySelectorAll('#productTable tr');
+            rows.forEach(row => {
+                let productName = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+                if (productName.includes(searchValue)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+</script>
+
+<!-- Estilos adicionales para mejorar el diseño -->
+<style>
+    .hover-effect:hover {
+        transform: scale(1.05);
+        transition: 0.3s;
+    }
+
+    .credit-widget {
+        margin-top: 20px;
+        border-radius: 10px;
+    }
+
+    .credit-bar {
+        background-color: #e0e0e0;
+        border-radius: 10px;
+        height: 30px;
+        width: 100%;
+        position: relative;
+    }
+
+    #credit-bar-fill {
+        background-color: #4caf50;
+        height: 100%;
+        border-radius: 10px;
+        transition: width 0.5s;
+    }
+
+    .credit-info {
+        margin-top: 10px;
+        font-size: 16px;
+        color: #333;
+    }
+</style>
+{% endblock %}

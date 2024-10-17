@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-header">
+    <h3 class="page-title"> Reporte de Ventas </h3>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('main.home') }}">Inicio</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Reporte de Ventas</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">Generar Reporte de Ventas</h4>
+                <form method="POST" class="mb-4">
+                    {{ form.hidden_tag() }}
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="client_id" class="form-label">Cliente</label>
+                            <select class="form-select" id="client_id" name="client_id">
+                                <option value="">Todos</option>
+                                {% for client in clients %}
+                                <option value="{{ client.id }}">{{ client.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="start_date" class="form-label">Fecha de Inicio</label>
+                            <input type="date" class="form-control" id="start_date" name="start_date">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label for="end_date" class="form-label">Fecha de Fin</label>
+                            <input type="date" class="form-control" id="end_date" name="end_date">
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary btn-block">Generar Reporte</button>
+                        </div>
+                    </div>
+                </form>
+
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Producto</th>
+                                <th>Cliente</th>
+                                <th>Cantidad</th>
+                                <th>Precio Total</th>
+                                <th>Fecha</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for sale in sales %}
+                            <tr>
+                                <td>{{ sale.product.name }}</td>
+                                <td>{{ sale.client.name }}</td>
+                                <td>{{ sale.quantity }}</td>
+                                <td>{{ "{:,.2f}".format(sale.total_price) }}</td> <!-- Formatear el precio -->
+                                <td>{{ sale.date.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <a href="{{ url_for('main.export_filtered_sales', client_id=request.form.client_id, start_date=request.form.start_date, end_date=request.form.end_date) }}"
+                    class="btn btn-info mt-3">Exportar Reporte a CSV</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="page-header">
+    <h3 class="page-title"><i class="typcn typcn-edit"></i> Editar Trabajador </h3>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('main.home') }}">Inicio</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('main.workers') }}">Trabajadores</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Editar Trabajador</li>
+        </ol>
+    </nav>
+</div>
+
+<div class="row">
+    <div class="col-md-12 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">Editar Trabajador</h4>
+                <p class="card-description">Complete el formulario para actualizar la información del trabajador.</p>
+                <form method="POST" action="" enctype="multipart/form-data">
+                    {{ form.hidden_tag() }}
+
+                    <div class="form-group">
+                        <label for="name">{{ form.name.label }}</label>
+                        {{ form.name(class="form-control", placeholder="Ingrese el nombre del trabajador") }}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="position">{{ form.position.label }}</label>
+                        {{ form.position(class="form-control", placeholder="Ingrese el cargo del trabajador") }}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">{{ form.phone.label }}</label>
+                        {{ form.phone(class="form-control", placeholder="Ej: 912345678") }}
+                        <!-- Cambiado el placeholder -->
+                        <small class="form-text text-muted">Formato: +56 9XX-XXX-XXX</small>
+                        <!-- Añadido para mayor claridad -->
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">{{ form.email.label }}</label>
+                        {{ form.email(class="form-control", placeholder="Ingrese el correo electrónico") }}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="photo">{{ form.photo.label }}</label><br>
+                        {% if worker.photo %}
+                        <img src="{{ url_for('static', filename='uploads/' + worker.photo) }}"
+                            alt="Foto actual del trabajador" width="100"><br><br>
+                        {% endif %}
+                        {{ form.photo(class="form-control-file") }}
+                    </div>
+
+                    <button type="submit" class="btn btn-primary"><i class="typcn typcn-tick"></i> Guardar
+                        Cambios</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    // Desvanecer mensajes flash
+    const alerts = document.querySelectorAll('.alert');
+    alerts.forEach(alert => {
+        setTimeout(() => {
+            alert.style.transition = 'opacity 0.5s ease';
+            alert.style.opacity = '0';
+            setTimeout(() => {
+                alert.remove();
+            }, 500);
+        }, 3000);
+    });
+</script>
+{% endblock %}
