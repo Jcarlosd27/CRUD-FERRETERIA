@@ -1,4 +1,4 @@
-# BIENVENIDOS A MI PRIMER PROYECTO CON PYTHON DEDICADO A MI QUERIDA SUEGRA YUBIANA
+# BIENVENIDOS A MI PRIMER PROYECTO CON PYTHON, ESPECIALIZADO EN LA GESTION LOGISTICA DE INVENTARIOS PARA EL AREA AGROINDUSTRIAL
 
 Este proyecto es una aplicación POS (Punto de Venta) para una ferretería. Está desarrollada en Python con Flask y SQL, y cuenta con un sistema de administración de productos, clientes y ventas.
 
